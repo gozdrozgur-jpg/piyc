@@ -1,41 +1,47 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May 14 09:46:24 2026
-
-@author: User
-"""
-
 import streamlit as st
 import numpy as np
 
 # Sayfa Yapılandırması
 st.set_page_config(page_title="PIYC Elite 6x6", layout="centered")
 
-# --- MOBİL UYUMLU CSS (IZGARA ZORLAMASI) ---
+# --- GELİŞMİŞ MOBİL VE GENEL IZGARA CSS ---
 st.markdown("""
     <style>
-    /* Sütunların mobilde alt alta gelmesini engelle, yan yana tut */
-    [data-testid="column"] {
-        width: calc(16.6% - 5px) !important;
-        flex: 1 1 calc(16.6% - 5px) !important;
-        min-width: calc(16.6% - 5px) !important;
-    }
-    
-    /* Buton boyutlarını telefon ekranı için optimize et */
-    .stButton>button {
-        height: 55px !important; 
-        width: 100% !important; 
-        font-size: 18px !important; 
-        font-weight: bold !important;
-        padding: 0px !important;
-        margin: 2px 0px !important;
-    }
-    
-    /* Konteynır boşluklarını daralt */
+    /* Ana konteynır boşluklarını sıfırla */
     .block-container {
         padding-top: 1rem !important;
+        padding-bottom: 0rem !important;
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
+    }
+
+    /* Sütunların mobilde alt alta geçmesini kesin olarak engelle */
+    [data-testid="column"] {
+        width: calc(16.66% - 2px) !important;
+        flex: 1 1 calc(16.66% - 2px) !important;
+        min-width: calc(16.66% - 2px) !important;
+        padding: 1px !important;
+    }
+
+    /* Sütunlar arası boşluğu (gap) kaldır */
+    [data-testid="stHorizontalBlock"] {
+        gap: 2px !important;
+    }
+
+    /* Buton tasarımı */
+    .stButton>button {
+        height: 50px !important;
+        width: 100% !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        border-radius: 4px !important;
+        padding: 0px !important;
+        background-color: #262730;
+    }
+
+    /* Üstteki seçim düğmelerini (pills) ortala */
+    div[data-testid="stMarkdownContainer"] > p {
+        text-align: center;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -69,10 +75,10 @@ if not st.session_state.game_over:
 else:
     st.success(f"🏆 Kazanan: **Oyuncu {st.session_state.winner}**")
 
-# 4. Rakam Seçimi
+# 4. Rakam Seçimi (Mobilde daha az yer kaplar)
 selected_num = st.pills("Seç:", [1, 2, 3, 4, 5, 6], selection_mode="single", default=1)
 
-# 5. 6x6 Izgara (Mobil Uyumlu)
+# 5. Oyun Tahtası
 for r in range(6):
     cols = st.columns(6)
     for c in range(6):
@@ -92,9 +98,11 @@ for r in range(6):
                             st.session_state.turn = next_player
                         st.rerun()
                     else:
-                        st.toast(f"Hata: {selected_num} çakışıyor!", icon="❌")
+                        st.toast(f"Çakışma: {selected_num}", icon="❌")
 
-# Reset
+# Alt Kısım Kontrolleri
+st.divider()
 if st.button("🔄 Yeni Oyun"):
-    del st.session_state.board
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
     st.rerun()
